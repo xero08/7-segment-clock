@@ -1,0 +1,176 @@
+<html>
+	<head>
+		<title>The time is</title>
+		<style>
+			:root{
+				--main-bg-color: yellow;
+			}
+			body{
+				background: #000;
+			}
+			.clockContainer{
+				margin: 14% 18%;
+			}
+			.digitContainer, .separatorContainer{
+				padding: 5px;
+			}
+			.digit{
+				display: inline-block;
+				margin-right: 10px;
+			}
+			.dot{
+				width: 10px;
+				height: 10px;
+				display: block;
+				margin-left: 10px;
+				margin-right: 10px;
+			}
+			.segment, .dot{
+				border-radius: 10px;
+			}
+			.horizontal{
+				width: 100px;
+				display: block;
+				margin-left: 5px;
+				height: 10px;
+			}
+			.vertical{
+				width: 10px;
+				display: inline-block;
+				height: 100px;
+			}
+			.vertical.right{
+				margin-left: 85px;
+			}
+			.neonText {
+			  	color: #fff;
+				box-shadow: 0 0 .2rem #fff,
+	            0 0 .2rem #fff,
+	            0 0 2rem var(--main-bg-color),
+	            0 0 0.8rem var(--main-bg-color),
+	            0 0 2.8rem var(--main-bg-color),
+	            inset 0 0 1.3rem var(--main-bg-color);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="clockContainer"></div>
+	</body>
+	<div id="digit_tmpl" style="display: none;" class="digitContainer">
+		<div class="digit">
+			<span class="segment horizontal h1">&nbsp;</span>
+			<span class="segment vertical left v1">&nbsp;</span>
+			<span class="segment vertical right v2">&nbsp;</span>
+			<span class="segment horizontal h2">&nbsp;</span>
+			<span class="segment vertical left v3">&nbsp;</span>
+			<span class="segment vertical right v4">&nbsp;</span>
+			<span class="segment horizontal h3">&nbsp;</span>
+		</div>
+	</div>
+	<div id="separator_tmpl" style="display: none;" class="separatorContainer">
+		<span class="dot dot1 neonText">&nbsp;</span>
+	</div>
+	<script type="text/javascript" src="jquery-3.6.0.min.js"></script>
+	<script type="text/javascript">
+		$("#digit_tmpl").clone().css("display", "inline-block").attr("id", "digit1").appendTo(".clockContainer");
+		$("#digit_tmpl").clone().css("display", "inline-block").attr("id", "digit2").appendTo(".clockContainer");
+		$("#separator_tmpl").clone().css("display", "inline-block").attr("id", "separator1").appendTo(".clockContainer");
+		$("#digit_tmpl").clone().css("display", "inline-block").attr("id", "digit3").appendTo(".clockContainer");
+		$("#digit_tmpl").clone().css("display", "inline-block").attr("id", "digit4").appendTo(".clockContainer");
+		$("#separator_tmpl").clone().css("display", "inline-block").attr("id", "separator2").appendTo(".clockContainer");
+		$("#digit_tmpl").clone().css("display", "inline-block").attr("id", "digit5").appendTo(".clockContainer");
+		$("#digit_tmpl").clone().css("display", "inline-block").attr("id", "digit6").appendTo(".clockContainer");
+		function renderDigit(digitNumber, value){
+			//Reset all segments
+			let segments = ["h1", "h2", "h3", "v1", "v2", "v3", "v4"];
+			let digit = $("#digit" + digitNumber);
+			segments.forEach((segment) => {
+				$(digit).find("." + segment).addClass("neonText");
+			});
+			let segmentsToHide = [];
+			switch(value){
+				case 0:
+					segmentsToHide = ["h2"];
+					break;
+				case 1:
+					segmentsToHide = ["h1", "h2", "h3", "v1", "v3"];
+					break;
+				case 2:
+					segmentsToHide = ["v1", "v4"];
+					break;
+				case 3:
+					segmentsToHide = ["v1", "v3"];
+					break;
+				case 4:
+					segmentsToHide = ["h1", "v3", "h3"];
+					break;
+				case 5:
+					segmentsToHide = ["v2", "v3"];
+					break;
+				case 6:
+					segmentsToHide = ["v2"];
+					break;
+				case 7:
+					segmentsToHide = ["v1", "h2", "v3", "h3"];
+					break;
+				case 8:
+					segmentsToHide = [];
+					break;
+				case 9:
+					segmentsToHide = ["v3"];
+					break;
+				default:
+					console.log("Nothing");
+			}
+			segmentsToHide.forEach((segment) => {
+				$(digit).find("." + segment).removeClass("neonText");
+			});
+		}
+
+		setInterval(() => {
+			let d = new Date();
+			let hours  = d.getHours();
+			if(hours < 10){
+				renderDigit(1, 0);
+				renderDigit(2, hours);
+			}
+			else{
+				renderDigit(2, hours%10);
+				renderDigit(1, (hours - hours%10)/10);
+			}
+			let minutes = d.getMinutes();
+			if(minutes < 10){
+				renderDigit(3, 0);
+				renderDigit(4, minutes);
+			}
+			else{
+				renderDigit(4, minutes%10);
+				renderDigit(3, (minutes - minutes%10)/10);
+			}
+			let seconds = d.getSeconds();
+			if(seconds < 10){
+				renderDigit(5, 0);
+				renderDigit(6, seconds);
+			}
+			else{
+				renderDigit(6, seconds%10);
+				renderDigit(5, (seconds - seconds%10)/10);
+			}
+		}, 1000);
+
+		function getUrlVars(){
+		    var vars = [], hash;
+		    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+		    for(var i = 0; i < hashes.length; i++)
+		    {
+		        hash = hashes[i].split('=');
+		        vars.push(hash[0]);
+		        vars[hash[0]] = hash[1];
+		    }
+		    return vars;
+		}
+
+		console.log(getUrlVars());
+		document.getElementsByClassName("clockContainer")[0].style.setProperty("--main-bg-color", getUrlVars()["color"]);
+	</script>
+</html>
